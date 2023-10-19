@@ -1,0 +1,7 @@
+------df_dados:-----
+
+[1m[31m[40mEmpty DataFrame
+
+[0m
+[1m[93m[40mColumns:[0m['Equipe 1', 'Equipe 2', 'Tempo', '-', 'Placar 1', 'Placar 2', 'Odds 1', 'Odds 2', 'Odds 3']
+[30m[41mindex           [0m[30m[41mindex        [0m
