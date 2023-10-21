@@ -167,10 +167,11 @@ while True:
                 equipe2_contem = df_final_end[1][i] in times_red['Equipe 2'].values
 
                 if not times_red.empty:
-                    equipe1_a_procurar = df_final_end[0][i]
-                    linha_correspondente = times_red[times_red['Equipe 1'] == equipe1_a_procurar]
-                    valor_correspondente = linha_correspondente.iloc[0, 6]
                     try:
+                        equipe1_a_procurar = df_final_end[0][i]
+                        linha_correspondente = times_red[times_red['Equipe 1'] == equipe1_a_procurar]
+                        valor_correspondente = linha_correspondente.iloc[0, 6]
+
                         equipe1_vantagem = valor_correspondente == 'Equipe 1' and int(df_final_end[4][i]) <= int(
                             df_final_end[5][i])
 
