@@ -94,7 +94,7 @@ while True:
         '\n').apply(pd.Series).reset_index(drop=True)
 
     df_final_end = df3.loc[df3.aa_innerText.str.split('\n').str[2:].apply(
-        lambda x: True if re.match(r'^9\d:\d{2}', 'Ç'.join(x)) else False)
+        lambda x: True if re.match(r'^7\d:\d{2}', 'Ç'.join(x)) else False)
     ].aa_innerText.str.split(
         '\n').apply(pd.Series).reset_index(drop=True)
 
@@ -108,10 +108,10 @@ while True:
         # Condição 4: Verifique se o menor valor entre as três Odds é maior ou igual a 1008.0
         if (
                 not df_final[0][i].endswith('Esports') and
-                not df_final[1][i].endswith('Esports') and
-                int(df_final[2][i].split(':')[0]) >= 78 and
-                int(abs(int(df_final[4][i]) - int(df_final[5][i]))) == 2 and
-                min(float(df_final[6][i]), float(df_final[7][i]), float(df_final[8][i])) >= 1.008
+                not df_final[1][i].endswith('Esports')
+                # int(df_final[2][i].split(':')[0]) >= 78 and
+                # int(abs(int(df_final[4][i]) - int(df_final[5][i]))) == 2 and
+                # min(float(df_final[6][i]), float(df_final[7][i]), float(df_final[8][i])) >= 1.008
         ):
             equipe_combinacao = f'{df_final[0][i]} vs {df_final[1][i]}'
 
@@ -141,10 +141,12 @@ while True:
 
             id_mensagem = bot.sendMessage(chat_id, message)
 
-            if df_dados.iloc[i, 4] > df_dados.iloc[i, 5]:
+            if int(df_dados.iloc[i, 4]) > int(df_dados.iloc[i, 5]):
                 time_vantagem = 'Equipe 1'
-            else:
+            elif int(df_dados.iloc[i, 5]) > int(df_dados.iloc[i, 4]):
                 time_vantagem = 'Equipe 2'
+            else:
+                time_vantagem = 'Nenhum'
 
             nova_linha = pd.DataFrame([[df_dados.iloc[i, 0], df_dados.iloc[i, 1], df_dados.iloc[i, 4],
                                         df_dados.iloc[i, 5], id_mensagem, message, time_vantagem]])
@@ -162,11 +164,14 @@ while True:
             equipe2_contem = df_final_end[1][i] in times_red['Equipe 2'].values
 
             if not times_red.empty:
+                equipe1_a_procurar = df_final_end[0][i]
+                linha_correspondente = times_red[times_red['Equipe 1'] == equipe1_a_procurar]
+                valor_correspondente = linha_correspondente.iloc[0, 6]
                 try:
-                    equipe1_vantagem = times_red.iloc[i, 6] == 'Equipe 1' and int(df_final_end.iloc[i, 4]) <= int(
-                        df_final_end.iloc[i, 5])
+                    equipe1_vantagem = valor_correspondente == 'Equipe 1' and int(df_final_end[4][i]) <= int(
+                        df_final_end[5][i])
 
-                    equipe2_vantagem = times_red.iloc[i, 6] == 'Equipe 2' and int(df_final_end[5][i]) <= int(
+                    equipe2_vantagem = valor_correspondente == 'Equipe 2' and int(df_final_end[5][i]) <= int(
                         df_final_end[4][i])
                 except:
                     equipe1_vantagem = False
@@ -175,12 +180,14 @@ while True:
                 equipe1_vantagem = False
                 equipe2_vantagem = False
 
+            print(f"{df_final_end[0][i]} ({df_final_end[4][i]}) e {df_final_end[1][i]} ({df_final_end[5][i]})")
+            print(times_red[['Equipe 1', 'Placar 1', 'Equipe 2', 'Placar 2', 'Vantagem']])
+            print(equipe1_contem, equipe2_contem, equipe1_vantagem)
+            print(equipe1_contem, equipe2_contem, equipe2_vantagem)
+
             if equipe1_contem and equipe2_contem and (equipe1_vantagem or equipe2_vantagem):
                 print('ACONTECEU UM RED')
-                print((int(chat_id),
-                       times_red.loc[times_red['Equipe 1'] == df_final_end[0][i], 'Id mensagem'].values[0][
-                           'message_id']),
-                      times_red.loc[times_red['Equipe 1'] == df_final_end[0][i], 'Texto'].values[0] + '❌')
+                print('------------------------------------------------------')
 
                 bot.editMessageText((int(chat_id),
                                      times_red.loc[times_red['Equipe 1'] == df_final_end[0][i], 'Id mensagem'].values[
@@ -189,15 +196,32 @@ while True:
                 times_red = times_red[
                     ~((times_red['Equipe 1'] == df_final_end[0][i]) & (times_red['Equipe 2'] == df_final_end[1][i]))]
 
+                '''
+                with open('arquivo.txt', 'a', encoding='utf-8') as arquivo:
+                    # Escreva o texto desejado no arquivo
+                    arquivo.write(f"{times_red.loc[times_red['Equipe 1'] == df_final_end[0][i], 'Texto'].values[0]}")
+                    arquivo.write('')
+                    arquivo.write('------df_final_end:-----\n')
+                    arquivo.write('')
+                    # Escreva o DataFrame df_final_end no arquivo (formato CSV)
+                    df_final_end.to_csv(arquivo, sep='\t', index=False)
+
+                    arquivo.write('------times_red:-----\n')
+                    arquivo.write('')
+                    # Escreva o DataFrame times_red no arquivo (formato CSV)
+                    times_red[['Equipe 1', 'Equipe 2', 'Placar 1', 'Placar 2']].to_csv(arquivo, sep='\t', index=False)
+                    arquivo.write('')
+                    
+                '''
     # Verificar se há tarefas agendadas
     schedule.run_pending()
 
     # Coloque um atraso entre as verificações
     # print('------df_dados:-----')
     # print(df_dados)
-    print('------df_final_end:-----')
-    print(df_final_end)
-    print('------times_red:-----')
-    print(times_red)
+    # print('------df_final_end:-----')
+    # print(df_final_end)
+    # print('------times_red:-----')
+    # print(times_red)
 
     time.sleep(3.1)

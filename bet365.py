@@ -48,8 +48,8 @@ chat_id = '-1001964302283'
 chat_id_private = '5497673724'
 
 # Dados tecnico
-#telegram_token = '6528253723:AAGCoqDVA4XnInPhRZGYJkZsrBSPP5Ra-Tw'
-#chat_id = '1431057250'
+# telegram_token = '6528253723:AAGCoqDVA4XnInPhRZGYJkZsrBSPP5Ra-Tw'
+# chat_id = '1431057250'
 
 # Inicializar o cliente Telepot
 bot = telepot.Bot(telegram_token)
@@ -144,12 +144,16 @@ while True:
 
                 if df_dados.iloc[i, 4] > df_dados.iloc[i, 5]:
                     time_vantagem = 'Equipe 1'
-                else:
+
+                if df_dados.iloc[i, 5] > df_dados.iloc[i, 4]:
                     time_vantagem = 'Equipe 2'
+                else:
+                    time_vantagem = 'Nenhum'
 
                 nova_linha = pd.DataFrame([[df_dados.iloc[i, 0], df_dados.iloc[i, 1], df_dados.iloc[i, 4],
                                             df_dados.iloc[i, 5], id_mensagem, message, time_vantagem]])
-                nova_linha.columns = ['Equipe 1', 'Equipe 2', 'Placar 1', 'Placar 2', 'Id mensagem', 'Texto', 'Vantagem']
+                nova_linha.columns = ['Equipe 1', 'Equipe 2', 'Placar 1', 'Placar 2', 'Id mensagem', 'Texto',
+                                      'Vantagem']
                 if not nova_linha.empty:
                     for i in range(len(nova_linha)):
                         if not nova_linha['Equipe 1'][i] in times_red['Equipe 1']:
@@ -157,43 +161,38 @@ while True:
                 times_red.columns = ['Equipe 1', 'Equipe 2', 'Placar 1', 'Placar 2', 'Id mensagem', 'Texto', 'Vantagem']
 
         if not df_final_end.empty:
-
             for i in range(len(df_final_end)):
 
                 equipe1_contem = df_final_end[0][i] in times_red['Equipe 1'].values
                 equipe2_contem = df_final_end[1][i] in times_red['Equipe 2'].values
 
                 if not times_red.empty:
+                    equipe1_a_procurar = df_final_end[0][i]
+                    linha_correspondente = times_red[times_red['Equipe 1'] == equipe1_a_procurar]
+                    valor_correspondente = linha_correspondente.iloc[0, 6]
                     try:
-                        equipe1_vantagem = times_red.iloc[i, 6] == 'Equipe 1' and int(df_final_end.iloc[i, 4]) <= int(
-                            df_final_end.iloc[i, 5])
+                        equipe1_vantagem = valor_correspondente == 'Equipe 1' and int(df_final_end[4][i]) <= int(
+                            df_final_end[5][i])
 
-                        equipe2_vantagem = times_red.iloc[i, 6] == 'Equipe 2' and int(df_final_end.iloc[i, 5]) <= int(
-                            df_final_end.iloc[i, 4])
+                        equipe2_vantagem = valor_correspondente == 'Equipe 2' and int(df_final_end[5][i]) <= int(
+                            df_final_end[4][i])
                     except:
                         equipe1_vantagem = False
                         equipe2_vantagem = False
-
                 else:
                     equipe1_vantagem = False
                     equipe2_vantagem = False
 
-                #print(df_final_end[0][i])
-                #print(times_red['Equipe 1'])
-                #print(equipe1_contem, equipe2_contem, equipe1_vantagem )
-
                 if equipe1_contem and equipe2_contem and (equipe1_vantagem or equipe2_vantagem):
-
-                    print('ACONTECEU UM RED')
-                    print((int(chat_id), times_red.loc[times_red['Equipe 1'] == df_final_end[0][i], 'Id mensagem'].values[0]['message_id']),
-                        times_red.loc[times_red['Equipe 1'] == df_final_end[0][i], 'Texto'].values[0] + '❌')
-
                     bot.editMessageText((int(chat_id),
-                         times_red.loc[times_red['Equipe 1'] == df_final_end[0][i], 'Id mensagem'].values[0]['message_id']),
-                         times_red.loc[times_red['Equipe 1'] == df_final_end[0][i], 'Texto'].values[0] + '❌')
+                                         times_red.loc[
+                                             times_red['Equipe 1'] == df_final_end[0][i], 'Id mensagem'].values[0][
+                                             'message_id']),
+                                        times_red.loc[times_red['Equipe 1'] == df_final_end[0][i], 'Texto'].values[
+                                            0] + '❌')
                     times_red = times_red[
-                        ~((times_red['Equipe 1'] == df_final_end[0][i]) & (times_red['Equipe 2'] == df_final_end[1][i]))]
-
+                        ~((times_red['Equipe 1'] == df_final_end[0][i]) & (
+                                times_red['Equipe 2'] == df_final_end[1][i]))]
 
         # Verificar se há tarefas agendadas
         schedule.run_pending()
@@ -201,10 +200,10 @@ while True:
         # Coloque um atraso entre as verificações
         # print('------df_dados:-----')
         # print(df_dados)
-        print('------df_final_end:-----')
-        print(df_final_end)
-        print('------times_red:-----')
-        print(times_red)
+        # print('------df_final_end:-----')
+        # print(df_final_end)
+        # print('------times_red:-----')
+        # print(times_red)
 
         time.sleep(3.1)
 
