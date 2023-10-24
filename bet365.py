@@ -76,7 +76,7 @@ df.loc[df.aa_classList.str.contains(
     'ccm-CookieConsentPopup_Accept', regex=False, na=False)].se_click.iloc[0]()
 
 # Agendar a função de recarregar a página a cada 30 minutos
-schedule.every(5).minutes.do(refresh_page)
+#schedule.every(5).minutes.do(refresh_page)
 
 times_red = pd.DataFrame(
     columns=['Equipe 1', 'Equipe 2', 'Placar 1', 'Placar 2', 'Id mensagem', 'Texto', 'Vantagem'])
@@ -200,7 +200,7 @@ while True:
                                 times_red['Equipe 2'] == df_final_end[1][i]))]
 
         # Verificar se há tarefas agendadas
-        schedule.run_pending()
+        #schedule.run_pending()
 
         # Coloque um atraso entre as verificações
         # print('------df_dados:-----')
