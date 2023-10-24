@@ -106,13 +106,17 @@ while True:
             # Condição 1: Verifique se o nome das equipes não termina com "Esports"
             # Condição 2: Verifique se o tempo é 78:00 ou mais
             # Condição 3: Calcule a diferença entre os placares e verifique se é 2 ou -2
-            # Condição 4: Verifique se o menor valor entre as três Odds é maior ou igual a 1008.0
+            # Condição 4: Verifique se o menor valor entre as três Odds é maior ou igual a 1008,0
+            # Condição 4: Verifique se o menor valor entre as três Odds dividido pélo maior valor é
+            # menor ou igual a 0,0153731343283582
             if (
                     not df_final[0][i].endswith('Esports') and
                     not df_final[1][i].endswith('Esports') and
                     int(df_final[2][i].split(':')[0]) >= 78 and
                     int(abs(int(df_final[4][i]) - int(df_final[5][i]))) == 2 and
-                    min(float(df_final[6][i]), float(df_final[7][i]), float(df_final[8][i])) >= 1.008
+                    min(float(df_final[6][i]), float(df_final[7][i]), float(df_final[8][i])) >= 1.008 and
+                    (min(float(df_final[6][i]), float(df_final[7][i]), float(df_final[8][i])) /
+                    max(float(df_final[6][i]), float(df_final[7][i]), float(df_final[8][i])) <= 0.0153731343283582)
             ):
                 equipe_combinacao = f'{df_final[0][i]} vs {df_final[1][i]}'
 
@@ -190,7 +194,7 @@ while True:
                                              times_red['Equipe 1'] == df_final_end[0][i], 'Id mensagem'].values[0][
                                              'message_id']),
                                         times_red.loc[times_red['Equipe 1'] == df_final_end[0][i], 'Texto'].values[
-                                            0] + '❌')
+                                            0] + 'red❌')
                     times_red = times_red[
                         ~((times_red['Equipe 1'] == df_final_end[0][i]) & (
                                 times_red['Equipe 2'] == df_final_end[1][i]))]
