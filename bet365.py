@@ -81,6 +81,9 @@ df.loc[df.aa_classList.str.contains(
 times_red = pd.DataFrame(
     columns=['Equipe 1', 'Equipe 2', 'Placar 1', 'Placar 2', 'Id mensagem', 'Texto', 'Vantagem'])
 
+data_verification = pd.DataFrame(
+    columns=['Equipe 1', 'Equipe 2', 'Placar 1', 'Placar 2', 'Id mensagem', 'Texto', 'Vantagem'])
+
 while True:
     try:
         if driver.find_element(By.CLASS_NAME, "ovm-Fixture_Container"):
@@ -164,40 +167,44 @@ while True:
                             times_red = pd.concat([times_red, nova_linha], axis=0)
                 times_red.columns = ['Equipe 1', 'Equipe 2', 'Placar 1', 'Placar 2', 'Id mensagem', 'Texto', 'Vantagem']
 
-        if not df_final_end.empty:
-            for i in range(len(df_final_end)):
+        if not data_verification.empty:
+            for i in range(len(data_verification)):
 
-                equipe1_contem = df_final_end[0][i] in times_red['Equipe 1'].values
-                equipe2_contem = df_final_end[1][i] in times_red['Equipe 2'].values
+                equipe1_contem = data_verification.iloc[i, 0] in times_red['Equipe 1'].values
+                equipe2_contem = data_verification.iloc[i, 1] in times_red['Equipe 2'].values
 
                 if not times_red.empty:
-                    try:
-                        equipe1_a_procurar = df_final_end[0][i]
-                        linha_correspondente = times_red[times_red['Equipe 1'] == equipe1_a_procurar]
-                        valor_correspondente = linha_correspondente.iloc[0, 6]
+                    equipe1_a_procurar = data_verification.iloc[i, 0]
+                    linha_correspondente1 = data_verification[data_verification['Equipe 1'] == equipe1_a_procurar]
+                    linha_correspondente1_times_red = times_red[times_red['Equipe 1'] == equipe1_a_procurar]
 
-                        equipe1_vantagem = valor_correspondente == 'Equipe 1' and int(df_final_end[4][i]) <= int(
-                            df_final_end[5][i])
+                    valor_correspondente1 = linha_correspondente1.iloc[0, 2]
+                    valor_correspondente1_times_red = linha_correspondente1_times_red.iloc[0, 2]
 
-                        equipe2_vantagem = valor_correspondente == 'Equipe 2' and int(df_final_end[5][i]) <= int(
-                            df_final_end[4][i])
-                    except:
-                        equipe1_vantagem = False
-                        equipe2_vantagem = False
+                    equipe2_a_procurar = data_verification.iloc[i, 1]
+                    linha_correspondente2 = data_verification[data_verification['Equipe 2'] == equipe2_a_procurar]
+                    linha_correspondente2_times_red = times_red[times_red['Equipe 1'] == equipe1_a_procurar]
+
+                    valor_correspondente2 = linha_correspondente2.iloc[0, 3]
+                    valor_correspondente2_times_red = linha_correspondente1_times_red.iloc[0, 3]
+
+                    equipe1_marcou = valor_correspondente1 > valor_correspondente1_times_red
+
+                    equipe2_marcou = valor_correspondente2 > valor_correspondente2_times_red
+
                 else:
-                    equipe1_vantagem = False
-                    equipe2_vantagem = False
+                    equipe1_marcou = False
+                    equipe2_marcou = False
 
-                if equipe1_contem and equipe2_contem and (equipe1_vantagem or equipe2_vantagem):
+                if equipe1_contem and equipe2_contem and (equipe1_marcou or equipe2_marcou):
                     bot.editMessageText((int(chat_id),
                                          times_red.loc[
-                                             times_red['Equipe 1'] == df_final_end[0][i], 'Id mensagem'].values[0][
+                                             times_red['Equipe 1'] == data_verification.iloc[
+                                                 i, 0], 'Id mensagem'].values[0][
                                              'message_id']),
-                                        times_red.loc[times_red['Equipe 1'] == df_final_end[0][i], 'Texto'].values[
-                                            0] + 'red❌')
-                    times_red = times_red[
-                        ~((times_red['Equipe 1'] == df_final_end[0][i]) & (
-                                times_red['Equipe 2'] == df_final_end[1][i]))]
+                                        times_red.loc[
+                                            times_red['Equipe 1'] == data_verification.iloc[i, 0], 'Texto'].values[
+                                            0] + f'Novo placar : {valor_correspondente1} a {valor_correspondente2}')
 
         # Verificar se há tarefas agendadas
         #schedule.run_pending()
