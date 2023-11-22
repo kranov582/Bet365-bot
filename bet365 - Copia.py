@@ -116,10 +116,10 @@ while True:
             # menor ou igual a 0,0153731343283582
             if (
                     not df_final[0][i].endswith('Esports') and
-                    not df_final[1][i].endswith('Esports')
-                    # int(df_final[2][i].split(':')[0]) >= 78 and
-                    # int(abs(int(df_final[4][i]) - int(df_final[5][i]))) == 2
-                    # min(float(df_final[6][i]), float(df_final[7][i]), float(df_final[8][i])) >= 1.008 and
+                    not df_final[1][i].endswith('Esports') and
+                    int(df_final[2][i].split(':')[0]) >= 78 and
+                    int(abs(int(df_final[4][i]) - int(df_final[5][i]))) == 2 and
+                    min(float(df_final[6][i]), float(df_final[7][i]), float(df_final[8][i])) >= 1.002
                     # (min(float(df_final[6][i]), float(df_final[7][i]), float(df_final[8][i])) /
                     # max(float(df_final[6][i]), float(df_final[7][i]), float(df_final[8][i])) <= 0.0153731343283582)
             ):
@@ -130,9 +130,13 @@ while True:
                                  'Odds 3']
 
                 data_verification = pd.concat([data_verification, jogos], axis=0)
+                #print('Antes do primeiro drop_duplicates')
+                #print(data_verification)
                 data_verification = data_verification.drop_duplicates(
                     subset=['Equipe 1', 'Equipe 2', 'Placar 1', 'Placar 2']
                     , keep='first')
+                #print('Depois do primeiro drop_duplicates')
+                #print(data_verification)
 
                 # Verifique se a combinação já está no cache
                 if equipe_combinacao not in equipe_combinacoes_cache:
@@ -178,6 +182,7 @@ while True:
         print('--------------times_red-------------')
         print(times_red)
 
+
         if not data_verification.empty:
             for i in range(len(data_verification)):
 
@@ -188,8 +193,8 @@ while True:
                 equipe2_a_procurar = data_verification.iloc[i, 1]
                 linha_correspondente1 = data_verification[data_verification['Equipe 1'] == equipe1_a_procurar]
                 linha_correspondente2 = data_verification[data_verification['Equipe 2'] == equipe2_a_procurar]
-                #linha_correspondente1_times_red = times_red[times_red['Equipe 1'] == equipe1_a_procurar]
-                #linha_correspondente2_times_red = times_red[times_red['Equipe 1'] == equipe1_a_procurar]
+                # linha_correspondente1_times_red = times_red[times_red['Equipe 1'] == equipe1_a_procurar]
+                # linha_correspondente2_times_red = times_red[times_red['Equipe 1'] == equipe1_a_procurar]
 
                 if len(linha_correspondente1) > 1:
                     valor_correspondente1 = linha_correspondente1.iloc[-1, 2]
@@ -215,7 +220,7 @@ while True:
                                          'Equipe 1 marcou': equipe1_marcou, 'Equipe 2 marcou': equipe2_marcou})
 
                 relatorio = pd.concat([relatorio, new_line])
-
+                """
                 print('--------------linha_correspondente1-------------')
                 print(linha_correspondente1)
                 print('--------------valor_correspondente1-------------')
@@ -232,22 +237,25 @@ while True:
                 print(equipe1_marcou)
                 print('--------------equipe2_marcou-------------')
                 print(equipe2_marcou)
-
+                """
                 if equipe1_contem and equipe2_contem and (equipe1_marcou or equipe2_marcou):
-                    bot.editMessageText((int(chat_id),
-                                         times_red.loc[
-                                             times_red['Equipe 1'] == data_verification.iloc[
-                                                 i, 0], 'Id mensagem'].values[0][
-                                             'message_id']),
-                                        times_red.loc[
-                                            times_red['Equipe 1'] == data_verification.iloc[i, 0], 'Texto'].values[
-                                            0] + f'Novo placar : {valor_correspondente1} a {valor_correspondente2}')
+                    try:
+                        bot.editMessageText((int(chat_id),
+                                             times_red.loc[
+                                                 times_red['Equipe 1'] == data_verification.iloc[
+                                                     i, 0], 'Id mensagem'].values[0][
+                                                 'message_id']),
+                                            times_red.loc[
+                                                times_red['Equipe 1'] == data_verification.iloc[i, 0], 'Texto'].values[
+                                                0] + f'Novo placar : {valor_correspondente1} a {valor_correspondente2}')
+                    except:
+                        data_verification = data_verification.drop(i)
 
-                    data_verification = data_verification.drop_duplicates(
-                        subset=['Equipe 1', 'Equipe 2']
-                        , keep='last')
-
-
+                    #data_verification = data_verification.drop_duplicates(
+                    #    subset=['Equipe 1', 'Equipe 2']
+                    #    , keep='last')
+                    #print('Depois do segundo drop_duplicates')
+                    #print(data_verification)
 
         new_line = pd.DataFrame({'Equipe 1': [''], 'Equipe 2': [''],
                                  'Placar 1 antigo': [''],
