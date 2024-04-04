@@ -12,6 +12,7 @@ from cachetools import TTLCache
 import schedule
 
 
+
 # Função para obter o dataframe a partir da página
 def obter_dataframe(query='*'):
     df = pd.DataFrame()
