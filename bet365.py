@@ -37,19 +37,14 @@ def refresh_page():
 def send_telegram_message(bot, chat_id, message):
     bot.sendMessage(chat_id, message)
 
-
 add_printer(1)
 
 # Configurar o token do seu bot do Telegram
 
 # Dados usuario
-telegram_token = '6245366890:AAE0O3-Xdrvw5BnTgitnOcwnj81mjVk-kpI'
-chat_id = '-1001964302283'
-chat_id_private = '5497673724'
-
-# Dados tecnico
-# telegram_token = '6528253723:AAGCoqDVA4XnInPhRZGYJkZsrBSPP5Ra-Tw'
-# chat_id = '1431057250'
+telegram_token = ''
+chat_id = ''
+chat_id_private = ''
 
 # Inicializar o cliente Telepot
 bot = telepot.Bot(telegram_token)
